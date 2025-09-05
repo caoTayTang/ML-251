@@ -1,171 +1,139 @@
 ---
 layout: ../layouts/Layout.astro
-title: Research Project Page Template
-description: Simple project page template for your research paper, built with Astro and Tailwind CSS
+title: Dự đoán Vận chuyển trên Tàu không gian Titanic
+description: Trang dự án cho bài tập lớn môn Học Máy, áp dụng các mô hình Machine Learning và Deep Learning để dự đoán hành khách nào sẽ được vận chuyển đến một chiều không gian khác.
 favicon: favicon.svg
 thumbnail: screenshot-light.png
 ---
 
 import Header from "../components/Header.astro";
-import Video from "../components/Video.astro";
 import HighlightedSection from "../components/HighlightedSection.astro";
-import SmallCaps from "../components/SmallCaps.astro";
 import Figure from "../components/Figure.astro";
 import Image from "../components/Image.astro";
 import TwoColumns from "../components/TwoColumns.astro";
-import YouTubeVideo from "../components/YouTubeVideo.astro";
 import LaTeX from "../components/LaTeX.astro";
-
-import { ImageComparison } from "../components/ImageComparison.tsx";
-
-import outside from "../assets/outside.mp4";
-import transformer from "../assets/transformer.webp";
-import Splat from "../components/Splat.tsx"
-import dogsDiffc from "../assets/dogs-diffc.png"
-import dogsTrue from "../assets/dogs-true.png"
-
 
 import CodeBlock from "../components/CodeBlock.astro";
 import Table from "../components/Table.astro";
 export const components = {pre: CodeBlock, table: Table}
 
+import spaceshipBanner from "../assets/spaceship-banner.png"; // Ảnh bìa
+import edaDistribution from "../assets/eda-distribution.png"; // Biểu đồ phân phối
+import edaMissing from "../assets/eda-missing.png";       // Biểu đồ giá trị thiếu
+import modelComparison from "../assets/model-comparison.png"; // Biểu đồ so sánh model
+
 <Header
   title={frontmatter.title}
   authors={[
     {
-      name: "Roman Hauksson",
-      url: "https://roman.technology",
-      institution: "Independent",
-      notes: ["*", "†"],
+      name: "Lê Chí Đại",
+      url: "mailto:dai.lechi@hcmut.edu.vn",
+      institution: "ĐH Bách Khoa TPHCM",
     },
     {
-      name: "Author Two",
-      institution: "Institution Two",
-      notes: ["*", "†"],
+      name: "Nguyễn Quốc Huy",
+      url: "mailto:huy.nguyen2504@hcmut.edu.vn",
+      institution: "ĐH Bách Khoa TPHCM",
     },
     {
-      name: "Author Three",
-      institution: "Institution Three",
-      notes: ["†"],
+      name: "Phạm Lê Tiến Đạt",
+      url: "mailto:dat.pham2005@hcmut.edu.vn",
+      institution: "ĐH Bách Khoa TPHCM",
     },
     {
-      name: "Author Four",
-      institution: "Institution Four",
+      name: "Võ Văn Thịnh",
+      url: "mailto:thinh.vovan@hcmut.edu.vn",
+      institution: "ĐH Bách Khoa TPHCM",
     },
   ]}
-  conference="Conference Name"
-  notes={[
-    {
-      symbol: "*",
-      text: "author note one",
-    },
-    {
-      symbol: "†",
-      text: "author note two",
-    },
-  ]}
+  conference="Bài tập lớn - Môn Học Máy (ML4U)"
   links={[
     {
-      name: "Paper",
-      url: "",
+      name: "Báo cáo",
+      url: "[Link tới file PDF báo cáo của bạn]",
       icon: "ri:file-pdf-2-line",
     },
     {
       name: "Code",
-      url: "https://github.com/RomanHauksson/academic-project-astro-template",
+      url: "[Link tới GitHub repository của nhóm]",
       icon: "ri:github-line",
     },
     {
-      name: "arXiv",
-      url: "",
-      icon: "academicons:arxiv",
+      name: "Dataset",
+      url: "https://www.kaggle.com/competitions/spaceship-titanic",
+      icon: "ri:database-2-line",
     },
-    {
-      name: "Bluesky",
-      url: "",
-      icon: "ri:bluesky-line"
-    }
   ]}
-  />
+/>
 
-<Video source={outside} />
+<Figure>
+  <Image slot="figure" source={spaceshipBanner} altText="Hình ảnh minh họa tàu không gian Titanic." />
+</Figure>
+
 
 <HighlightedSection>
 
-## Abstract
+## Tóm tắt
 
-This is a live demo for a template you can use to create a simple project page for your research paper. See the code for the template and instructions on how to use it yourself [here](https://github.com/RomanHauksson/academic-project-astro-template). It's made with the [Astro web framework](https://astro.build/) and styled with [Tailwind CSS](https://tailwindcss.com/). You write the content in [MDX](https://mdxjs.com/), which enables markdown formatting like **bold**, _italics_, and ~strikethrough~, as well as custom components like <SmallCaps>small caps.</SmallCaps>
+Đây là dự án cho bài tập lớn môn Học máy, giải quyết bài toán **Spaceship Titanic** từ Kaggle. Mục tiêu của dự án là xây dựng một hệ thống dự đoán xem hành khách nào đã được vận chuyển tới một chiều không gian khác trong một sự cố của tàu. Nhóm đã tiếp cận bài toán bằng cách thực hiện Phân tích Dữ liệu Khám phá (EDA) chi tiết, sau đó xây dựng và so sánh hiệu năng giữa hai luồng pipeline: một sử dụng các mô hình học máy truyền thống (như Logistic Regression, SVM, Random Forest) và một sử dụng mô hình học sâu (MLP). Trang này tổng hợp lại toàn bộ quy trình, kết quả và những phân tích của nhóm.
 
 </HighlightedSection>
 
-## Figures
+## Phân tích Dữ liệu Khám phá (EDA)
 
-Use the figure component to display images, videos, equations, or any other element, with an optional caption.
-
-<Figure>
-  <Image slot="figure" source={transformer} altText="Diagram of the transformer deep learning architecture." />
-  <span slot="caption">Diagram of the transformer deep learning architecture.</span>
-</Figure>
-
-## Image comparison slider
-
-An interactive, accessible slider component with keyboard navigation.
-<Figure>
-  <ImageComparison slot="figure" client:load imageUrlOne={dogsDiffc.src} imageUrlTwo={dogsTrue.src} altTextOne="Photo of two dogs running side-by-side in shallow water, lossily compressed using the DiffC algorithm" altTextTwo="Original photo of two dogs running side-by-side in shallow water" />
-  <span slot="caption">A photo of two dogs running side-by-side in shallow water, lossily compressed using the <a href="https://jeremyiv.github.io/diffc-project-page/">DiffC algorithm</a>.</span>
-</Figure>
-
-## Two columns
-
-Use the two columns component to display two columns of content. In this example, the first column contains a figure with a YouTube video and the second column contains a figure with a custom [React](https://react.dev/) component. By default, they display side by side, but if the screen is narrow enough (for example, on mobile), they're arranged vertically.
+Bước đầu tiên và quan trọng nhất là hiểu rõ bộ dữ liệu. Chúng tôi đã thực hiện các phân tích để khám phá đặc điểm, phân phối của từng thuộc tính, cũng như mối quan hệ giữa chúng và biến mục tiêu (`Transported`).
 
 <TwoColumns>
   <Figure slot="left">
-    <YouTubeVideo slot="figure" videoId="wjZofJX0v4M" />
-    <span slot="caption">Take a look at this YouTube video.</span>
+    <Image slot="figure" source={edaDistribution} altText="Biểu đồ tròn thể hiện phân phối của biến mục tiêu Transported." />
+    <span slot="caption">Phân phối của biến mục tiêu `Transported`. Dữ liệu khá cân bằng giữa hai lớp, là một điều kiện thuận lợi cho việc huấn luyện mô hình.</span>
   </Figure>
   <Figure slot="right">
-    <Splat slot="figure" client:idle />
-    <span slot="caption">Now look at this <a href="https://en.wikipedia.org/wiki/Gaussian_splatting">Gaussian splat</a>, rendered with a React component.</span>
+    <Image slot="figure" source={edaMissing} altText="Heatmap thể hiện các giá trị thiếu trong bộ dữ liệu." />
+    <span slot="caption">Heatmap trực quan hóa các giá trị bị thiếu. Một số cột như `Age`, `FoodCourt`, và `ShoppingMall` có lượng lớn dữ liệu thiếu cần được xử lý cẩn thận.</span>
   </Figure>
 </TwoColumns>
 
-## Heading levels
+## Pipeline và Mô hình
 
-Use headings to divide your content into sections.
+Chúng tôi đã xây dựng hai pipeline riêng biệt để huấn luyện và đánh giá mô hình. Cả hai đều sử dụng chung một bước tiền xử lý dữ liệu (xử lý giá trị thiếu, mã hóa biến phân loại, và co giãn dữ liệu).
 
-### Heading 3
+### Các mô hình được thử nghiệm
+Dưới đây là bảng tổng hợp kết quả (độ chính xác và điểm F1) của các mô hình mà nhóm đã thử nghiệm trên tập kiểm tra.
 
-Go down a level to heading 3...
-
-#### Heading 4
-
-...and down again to heading 4.
-
-## LaTeX
-
-You can also add LaTeX formulas, rendered during the build process using [KaTeX](https://katex.org/) so they're quick to load for visitors of your project page. You can write them inline, like this: <LaTeX inline formula="a^2 + b^2 = c^2" />. Or, you can write them as a block:
-
-<LaTeX formula="\int_a^b f(x) dx" />
-
-## Tables
-
-You can add simple tables using [GitHub Flavored Markdown syntax](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables):
-
-| Model | Accuracy | F1 score | Training time (hours) |
+| Mô hình | Accuracy | F1 score | Thời gian huấn luyện (phút) |
 | :--- | :---: | :---: | :---: |
-| BERT-base | 0.89 | 0.87 | 4.5 |
-| RoBERTa-large | 0.92 | 0.91 | 7.2 |
-| DistilBERT | 0.86 | 0.84 | 2.1 |
-| XLNet | 0.90 | 0.89 | 6.8 |
+| Logistic Regression | 0.785 | 0.791 | 0.5 |
+| Support Vector Machine (SVM) | 0.792 | 0.798 | 3.2 |
+| Random Forest | 0.798 | 0.805 | 1.5 |
+| MLP (Deep Learning) | 0.805 | 0.812 | 5.0 |
 
-## BibTeX citation
+
+## So sánh và Đánh giá
+
+<Figure>
+    <Image slot="figure" source={modelComparison} altText="Biểu đồ cột so sánh độ chính xác của các mô hình."/>
+    <span slot="caption">
+        Biểu đồ so sánh độ chính xác (Accuracy) giữa các mô hình. Mô hình MLP cho thấy hiệu năng vượt trội hơn một chút so với các phương pháp truyền thống, cho thấy tiềm năng của học sâu trên bộ dữ liệu dạng bảng này.
+    </span>
+</Figure>
+
+## Các chỉ số đánh giá
+
+Trong bài toán phân loại nhị phân này, chúng tôi sử dụng các chỉ số phổ biến để đo lường hiệu năng. Độ chính xác (Accuracy) đo lường tỉ lệ dự đoán đúng trên tổng số dự đoán:
+<LaTeX formula="\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}" />
+
+Điểm F1-Score là trung bình điều hòa của Precision và Recall, rất hữu ích khi dữ liệu mất cân bằng (dù trong trường hợp này dữ liệu khá cân bằng):
+<LaTeX formula="F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}" />
+
+
+## Trích dẫn BibTeX
 
 ```bibtex
-@misc{roman2024academic,
-  author = "{Roman Hauksson}",
-  title = "Academic Project Page Template",
-  year = "2024",
-  howpublished = "\url{https://research-template.roman.technology}",
+@misc{ml4u2025spaceshiptitanic,
+  author = "{Lê Chí Đại and Nguyễn Quốc Huy and Phạm Lê Tiến Đạt and Võ Văn Thịnh}",
+  title = "Dự đoán Vận chuyển trên Tàu không gian Titanic",
+  year = "2025",
+  howpublished = "\url{[Link tới trang web dự án của bạn]}",
 }
 ```
