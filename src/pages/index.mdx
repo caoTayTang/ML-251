@@ -21,6 +21,8 @@ import heroBanner from "../assets/hero-spaceship.png";
 import edaTarget from "../assets/eda-target-balance.png";
 import edaMissing from "../assets/eda-missing-heatmap.png";
 import modelLeaderboard from "../assets/model-leaderboard.png";
+import experiment from "../assets/experiment.png";
+
 
 <Header
   title={frontmatter.title}
@@ -113,22 +115,17 @@ Kết quả: **XGBoost** dẫn đầu ổn định;
 
 <Figure>
   <Image slot="figure" source={modelLeaderboard} altText="Biểu đồ cột so sánh accuracy giữa các mô hình." />
-  <span slot="caption">Bảng xếp hạng mô hình</span>
+  <span slot="caption">So sánh chi tiết thông số</span>
+
 </Figure>
 
 ## Bảng tổng hợp kết quả
 
-> Lưu ý: thay số liệu bằng kết quả mới nhất của bạn từ notebook.
 
-| Mô hình | Accuracy | Precision | Recall | F1 |
-|:--|:--:|:--:|:--:|:--:|
-| XGBoost — PCA@0.95 | **0.810** | 0.810 | 0.810 | 0.810 |
-| XGBoost — PCA@0.90 | 0.804 | 0.805 | 0.804 | 0.804 |
-| Random Forest — PCA@0.95 | 0.799 | 0.800 | 0.799 | 0.799 |
-| Gradient Boosting — PCA@1.0 | 0.796 | 0.797 | 0.796 | 0.796 |
-| SVM (RBF) — PCA@1.0 | 0.797 | 0.797 | 0.797 | 0.797 |
-| Logistic Regression — PCA@1.0 | 0.787 | 0.787 | 0.787 | 0.787 |
-| Decision Tree — PCA@1.0 | 0.736 | 0.736 | 0.736 | 0.736 |
+<Figure>
+  <Image slot="figure" source={experiment} altText="." />
+  <span slot="caption">Bảng xếp hạng mô hình</span>
+</Figure>
 
 <HighlightedSection>
 
