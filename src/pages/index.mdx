@@ -1,9 +1,9 @@
 ---
 layout: ../layouts/Layout.astro
-title: Dự đoán Vận chuyển trên Tàu không gian Titanic
-description: Trang dự án cho bài tập lớn môn Học Máy, áp dụng các mô hình Machine Learning và Deep Learning để dự đoán hành khách nào sẽ được vận chuyển đến một chiều không gian khác.
+title: "Spaceship Titanic — Dự đoán Vận chuyển"
+description: "Landing page vui–mà–xịn cho bài tập lớn ML: từ EDA → pipeline → so sánh mô hình → kết quả."
 favicon: favicon.svg
-thumbnail: screenshot-light.png
+thumbnail: og-spaceship.png
 ---
 
 import Header from "../components/Header.astro";
@@ -15,12 +15,12 @@ import LaTeX from "../components/LaTeX.astro";
 
 import CodeBlock from "../components/CodeBlock.astro";
 import Table from "../components/Table.astro";
-export const components = {pre: CodeBlock, table: Table}
+export const components = { pre: CodeBlock, table: Table };
 
-import spaceshipBanner from "../assets/spaceship-banner.png"; // Ảnh bìa
-import edaDistribution from "../assets/eda-distribution.png"; // Biểu đồ phân phối
-import edaMissing from "../assets/eda-missing.png";       // Biểu đồ giá trị thiếu
-import modelComparison from "../assets/model-comparison.png"; // Biểu đồ so sánh model
+import heroBanner from "../assets/hero-spaceship.png";
+import edaTarget from "../assets/eda-target-balance.png";
+import edaMissing from "../assets/eda-missing-heatmap.png";
+import modelLeaderboard from "../assets/model-leaderboard.png";
 
 <Header
   title={frontmatter.title}
@@ -50,12 +50,12 @@ import modelComparison from "../assets/model-comparison.png"; // Biểu đồ so
   links={[
     {
       name: "Báo cáo",
-      url: "[Link tới file PDF báo cáo của bạn]",
+      url: "https://github.com/caoTayTang/ML251/raw/main/docs/SpaceshipTitanic_Report.pdf",
       icon: "ri:file-pdf-2-line",
     },
     {
       name: "Code",
-      url: "[Link tới GitHub repository của nhóm]",
+      url: "https://github.com/caoTayTang/ML251",
       icon: "ri:github-line",
     },
     {
@@ -67,73 +67,113 @@ import modelComparison from "../assets/model-comparison.png"; // Biểu đồ so
 />
 
 <Figure>
-  <Image slot="figure" source={spaceshipBanner} altText="Hình ảnh minh họa tàu không gian Titanic." />
+  <Image slot="figure" source={heroBanner} altText="Minh hoạ con tàu Spaceship Titanic đang du hành vũ trụ." />
+  <span slot="caption">Một cú rẽ nhánh sai là... sang chiều không gian khác 🛸</span>
 </Figure>
-
 
 <HighlightedSection>
 
 ## Tóm tắt
 
-Đây là dự án cho bài tập lớn môn Học máy, giải quyết bài toán **Spaceship Titanic** từ Kaggle. Mục tiêu của dự án là xây dựng một hệ thống dự đoán xem hành khách nào đã được vận chuyển tới một chiều không gian khác trong một sự cố của tàu. Nhóm đã tiếp cận bài toán bằng cách thực hiện Phân tích Dữ liệu Khám phá (EDA) chi tiết, sau đó xây dựng và so sánh hiệu năng giữa hai luồng pipeline: một sử dụng các mô hình học máy truyền thống (như Logistic Regression, SVM, Random Forest) và một sử dụng mô hình học sâu (MLP). Trang này tổng hợp lại toàn bộ quy trình, kết quả và những phân tích của nhóm.
+Bài toán **Spaceship Titanic** (Kaggle) yêu cầu dự đoán hành khách nào bị *Transported* (dịch chuyển sang chiều không gian khác) sau sự cố trên tàu. Chúng mình làm:
+
+- **EDA**: soi phân phối, missing, và mối liên hệ với `Transported`.
+- **Feature Engineering**: tách `Cabin → Deck/Side`, tách `PassengerId → Group/Member`, chuẩn hoá chi tiêu.
+- **Hai pipeline**: một dành cho mô hình ML chuẩn (impute + scale + one-hot), và một tối ưu cho **XGBoost** (giữ lại missing value).
+- **So sánh mô hình**: Logistic Regression, SVM (RBF), Decision Tree, Random Forest, Gradient Boosting, **XGBoost**.
+
+Kết quả: **XGBoost** dẫn đầu ổn định;
 
 </HighlightedSection>
 
-## Phân tích Dữ liệu Khám phá (EDA)
-
-Bước đầu tiên và quan trọng nhất là hiểu rõ bộ dữ liệu. Chúng tôi đã thực hiện các phân tích để khám phá đặc điểm, phân phối của từng thuộc tính, cũng như mối quan hệ giữa chúng và biến mục tiêu (`Transported`).
+## Khám phá dữ liệu (EDA)
 
 <TwoColumns>
   <Figure slot="left">
-    <Image slot="figure" source={edaDistribution} altText="Biểu đồ tròn thể hiện phân phối của biến mục tiêu Transported." />
-    <span slot="caption">Phân phối của biến mục tiêu `Transported`. Dữ liệu khá cân bằng giữa hai lớp, là một điều kiện thuận lợi cho việc huấn luyện mô hình.</span>
+    <Image slot="figure" source={edaTarget} altText="Biểu đồ phân phối biến mục tiêu Transported (True/False)." />
+    <span slot="caption">`Transported` gần như cân bằng → thuận lợi cho phân loại.</span>
   </Figure>
   <Figure slot="right">
-    <Image slot="figure" source={edaMissing} altText="Heatmap thể hiện các giá trị thiếu trong bộ dữ liệu." />
-    <span slot="caption">Heatmap trực quan hóa các giá trị bị thiếu. Một số cột như `Age`, `FoodCourt`, và `ShoppingMall` có lượng lớn dữ liệu thiếu cần được xử lý cẩn thận.</span>
+    <Image slot="figure" source={edaMissing} altText="Heatmap hiển thị tỉ lệ giá trị thiếu theo cột." />
+    <span slot="caption">Missing tập trung ở nhóm chi tiêu & một phần ở `Age` → cần chiến lược xử lý rõ ràng.</span>
   </Figure>
 </TwoColumns>
 
-## Pipeline và Mô hình
+## Tiền xử lý & Pipeline
 
-Chúng tôi đã xây dựng hai pipeline riêng biệt để huấn luyện và đánh giá mô hình. Cả hai đều sử dụng chung một bước tiền xử lý dữ liệu (xử lý giá trị thiếu, mã hóa biến phân loại, và co giãn dữ liệu).
+- **Tách đặc trưng**: Deck, Side từ Cabin; Group, Member từ PassengerId.
+- **Pipeline ML chuẩn**: SimpleImputer(median/most_frequent) → StandardScaler → OneHotEncoder.
+- **Pipeline thân thiện XGBoost**: mapping về số nhưng **giữ NaN** (XGBoost xử lý native), hạn chế ép kiểu gây mất thông tin missing.
 
-### Các mô hình được thử nghiệm
-Dưới đây là bảng tổng hợp kết quả (độ chính xác và điểm F1) của các mô hình mà nhóm đã thử nghiệm trên tập kiểm tra.
+## Mô hình & Thiết lập
 
-| Mô hình | Accuracy | F1 score | Thời gian huấn luyện (phút) |
-| :--- | :---: | :---: | :---: |
-| Logistic Regression | 0.785 | 0.791 | 0.5 |
-| Support Vector Machine (SVM) | 0.792 | 0.798 | 3.2 |
-| Random Forest | 0.798 | 0.805 | 1.5 |
-| MLP (Deep Learning) | 0.805 | 0.812 | 5.0 |
-
-
-## So sánh và Đánh giá
+- **ML cổ điển**: Logistic Regression, SVM (RBF), Decision Tree, Random Forest, Gradient Boosting.
+- **Boosting hiện đại**: **XGBoost**.
+- **Đánh giá**: Accuracy, Precision, Recall, F1 (weighted). K-fold Stratified.
 
 <Figure>
-    <Image slot="figure" source={modelComparison} altText="Biểu đồ cột so sánh độ chính xác của các mô hình."/>
-    <span slot="caption">
-        Biểu đồ so sánh độ chính xác (Accuracy) giữa các mô hình. Mô hình MLP cho thấy hiệu năng vượt trội hơn một chút so với các phương pháp truyền thống, cho thấy tiềm năng của học sâu trên bộ dữ liệu dạng bảng này.
-    </span>
+  <Image slot="figure" source={modelLeaderboard} altText="Biểu đồ cột so sánh accuracy giữa các mô hình." />
+  <span slot="caption">Bảng xếp hạng mô hình</span>
 </Figure>
 
-## Các chỉ số đánh giá
+## Bảng tổng hợp kết quả
 
-Trong bài toán phân loại nhị phân này, chúng tôi sử dụng các chỉ số phổ biến để đo lường hiệu năng. Độ chính xác (Accuracy) đo lường tỉ lệ dự đoán đúng trên tổng số dự đoán:
+> Lưu ý: thay số liệu bằng kết quả mới nhất của bạn từ notebook.
+
+| Mô hình | Accuracy | Precision | Recall | F1 |
+|:--|:--:|:--:|:--:|:--:|
+| XGBoost — PCA@0.95 | **0.810** | 0.810 | 0.810 | 0.810 |
+| XGBoost — PCA@0.90 | 0.804 | 0.805 | 0.804 | 0.804 |
+| Random Forest — PCA@0.95 | 0.799 | 0.800 | 0.799 | 0.799 |
+| Gradient Boosting — PCA@1.0 | 0.796 | 0.797 | 0.796 | 0.796 |
+| SVM (RBF) — PCA@1.0 | 0.797 | 0.797 | 0.797 | 0.797 |
+| Logistic Regression — PCA@1.0 | 0.787 | 0.787 | 0.787 | 0.787 |
+| Decision Tree — PCA@1.0 | 0.736 | 0.736 | 0.736 | 0.736 |
+
+<HighlightedSection>
+
+## Nhận xét nhanh
+
+- **XGBoost** vượt trội và ổn định trên hầu hết chỉ số;
+- **Random Forest / Gradient Boosting** bám sát nhóm trên; **SVM/LogReg** hưởng lợi vừa phải từ PCA.
+- **Decision Tree** đơn thuần yếu hơn rõ rệt → nên dùng ensemble hoặc boosting.
+
+</HighlightedSection>
+
+## Công thức chỉ số
+
+Độ chính xác (Accuracy):
 <LaTeX formula="\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}" />
 
-Điểm F1-Score là trung bình điều hòa của Precision và Recall, rất hữu ích khi dữ liệu mất cân bằng (dù trong trường hợp này dữ liệu khá cân bằng):
+Điểm F1-Score:
 <LaTeX formula="F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}" />
 
+## Reproduce
 
-## Trích dẫn BibTeX
+```bash
+# Clone repo
+git clone https://github.com/caoTayTang/ML251.git
+cd ML251
+
+# (Tuỳ chọn) Tạo môi trường & cài đặt phụ thuộc
+# pip install -r requirements.txt
+# hoặc dùng uv:
+# uv pip install -r requirements.txt
+
+# Mở notebook / hoặc build trang
+# jupyter lab
+# npm install && npm run dev   # nếu chạy phần web (Astro)
+```
+
+## Trích dẫn (BibTeX)
 
 ```bibtex
 @misc{ml4u2025spaceshiptitanic,
-  author = "{Lê Chí Đại and Nguyễn Quốc Huy and Phạm Lê Tiến Đạt and Võ Văn Thịnh}",
-  title = "Dự đoán Vận chuyển trên Tàu không gian Titanic",
-  year = "2025",
-  howpublished = "\url{[Link tới trang web dự án của bạn]}",
+  author       = "{Lê Chí Đại and Nguyễn Quốc Huy and Phạm Lê Tiến Đạt and Võ Văn Thịnh}",
+  title        = "Dự đoán Vận chuyển trên Tàu không gian Titanic",
+  year         = "2025",
+  howpublished = "\url{https://caotaytang.github.io/ML-251/}",
 }
 ```
+
+---
