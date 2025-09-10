@@ -6,11 +6,6 @@ favicon: "favicon.png"
 thumbnail: "favicon.png"
 ---
 
-<div class="flex flex-col items-center text-center space-y-4 mt-6">
-  <img src="../public/favicon.png" alt="HCMUT Logo" class="w-28 h-28 mx-auto" />
-</div>
-
----
 import Header from "../components/Header.astro";
 import HighlightedSection from "../components/HighlightedSection.astro";
 import Figure from "../components/Figure.astro";
@@ -18,9 +13,17 @@ import Image from "../components/Image.astro";
 import TwoColumns from "../components/TwoColumns.astro";
 import LaTeX from "../components/LaTeX.astro";
 
+import logo from "../assets/hcmut-logo.png";
+
 import CodeBlock from "../components/CodeBlock.astro";
 import Table from "../components/Table.astro";
 export const components = { pre: CodeBlock, table: Table };
+
+
+<Figure>
+    <Image slot="figure" altText="HCMUT logo" source={logo}  width="170rem" height="170rem"/>
+</Figure>
+
 
 <Header
   title={frontmatter.title}
