@@ -1,0 +1,165 @@
+---
+layout: ../layouts/Layout.astro
+title: "Spaceship Titanic — Dự đoán Dịch chuyển"
+description: "Landing page cho bài tập lớn ML: từ EDA → pipeline → so sánh mô hình → kết quả."
+favicon: favicon.png
+thumbnail: og-spaceship.png
+---
+
+import Header from "../components/Header.astro";
+import HighlightedSection from "../components/HighlightedSection.astro";
+import Figure from "../components/Figure.astro";
+import Image from "../components/Image.astro";
+import TwoColumns from "../components/TwoColumns.astro";
+import LaTeX from "../components/LaTeX.astro";
+
+import CodeBlock from "../components/CodeBlock.astro";
+import Table from "../components/Table.astro";
+export const components = { pre: CodeBlock, table: Table };
+
+import heroBanner from "../assets/hero-spaceship.png";
+import edaTarget from "../assets/eda-target-balance.png";
+import edaMissing from "../assets/eda-missing-heatmap.png";
+import modelLeaderboard from "../assets/model-leaderboard.png";
+import experiment from "../assets/experiment.png";
+
+
+<Header
+  title={frontmatter.title}
+  authors={[
+    {
+      name: "Lê Chí Đại",
+      url: "mailto:dai.lechi@hcmut.edu.vn",
+      institution: "ĐH Bách Khoa TPHCM",
+    },
+    {
+      name: "Nguyễn Quốc Huy",
+      url: "mailto:huy.nguyen2504@hcmut.edu.vn",
+      institution: "ĐH Bách Khoa TPHCM",
+    },
+    {
+      name: "Phạm Lê Tiến Đạt",
+      url: "mailto:dat.pham2005@hcmut.edu.vn",
+      institution: "ĐH Bách Khoa TPHCM",
+    },
+    {
+      name: "Võ Văn Thịnh",
+      url: "mailto:thinh.vovan@hcmut.edu.vn",
+      institution: "ĐH Bách Khoa TPHCM",
+    },
+  ]}
+  conference="Bài tập lớn - Môn Học Máy (ML4U)"
+  links={[
+    {
+      name: "Báo cáo",
+      url: "https://github.com/caoTayTang/ML251/raw/main/docs/SpaceshipTitanic_Report.pdf",
+      icon: "ri:file-pdf-2-line",
+    },
+    {
+      name: "Code",
+      url: "https://github.com/caoTayTang/ML251",
+      icon: "ri:github-line",
+    },
+    {
+      name: "Dataset",
+      url: "https://www.kaggle.com/competitions/spaceship-titanic",
+      icon: "ri:database-2-line",
+    },
+  ]}
+/>
+
+<Figure>
+  <Image slot="figure" source={heroBanner} altText="Minh hoạ con tàu Spaceship Titanic đang du hành vũ trụ." />
+  <span slot="caption">Một cú rẽ nhánh sai là... sang chiều không gian khác 🛸</span>
+</Figure>
+
+<HighlightedSection>
+
+## Tóm tắt
+
+Bài toán **Spaceship Titanic** (Kaggle) yêu cầu dự đoán hành khách nào bị *Transported* (dịch chuyển sang chiều không gian khác) sau sự cố trên tàu. Chúng mình làm:
+
+- **EDA**: phân phối, missing value, và mối liên hệ với `Transported`.
+- **Feature Engineering**: tách `Cabin → Deck/Side`, tách `PassengerId → Group/Member`, chuẩn hoá chi tiêu.
+- **Hai pipeline**: một dành cho mô hình ML chuẩn (impute + scale + one-hot), và một tối ưu cho **XGBoost** (giữ lại missing value).
+- **So sánh mô hình**: Logistic Regression, SVM (RBF), Decision Tree, Random Forest, Gradient Boosting, **XGBoost**.
+
+Kết quả: **XGBoost** dẫn đầu ổn định.
+
+</HighlightedSection>
+
+## Khám phá dữ liệu (EDA)
+
+<TwoColumns>
+  <Figure slot="left">
+    <Image slot="figure" source={edaTarget} altText="Biểu đồ phân phối biến mục tiêu Transported (True/False)." />
+    <span slot="caption">`Transported` gần như cân bằng → thuận lợi cho phân loại.</span>
+  </Figure>
+  <Figure slot="right">
+    <Image slot="figure" source={edaMissing} altText="Heatmap hiển thị tỉ lệ giá trị thiếu theo cột." />
+    <span slot="caption">Missing tập trung ở nhóm chi tiêu & một phần ở `Age` → cần chiến lược xử lý rõ ràng.</span>
+  </Figure>
+</TwoColumns>
+
+## Tiền xử lý & Pipeline
+
+- **Tách đặc trưng**: Deck, Side từ Cabin; Group, Member từ PassengerId.
+- **Pipeline ML chuẩn**: SimpleImputer(median/most_frequent) → StandardScaler → OneHotEncoder.
+- **Pipeline thân thiện XGBoost**: mapping về số nhưng **giữ NaN** (XGBoost xử lý native).
+
+## Mô hình & Thiết lập
+
+- **ML cổ điển**: Logistic Regression, SVM (RBF), Decision Tree, Random Forest, Gradient Boosting.
+- **Boosting hiện đại**: **XGBoost**.
+- **Đánh giá**: Accuracy, Precision, Recall, F1 (weighted). Stratified k-fold CV.
+
+<Figure>
+  <Image slot="figure" source={modelLeaderboard} altText="Biểu đồ cột so sánh accuracy giữa các mô hình." />
+  <span slot="caption">So sánh accuracy giữa các mô hình</span>
+</Figure>
+
+## Kết quả & Phân tích
+
+<Figure>
+  <Image slot="figure" source={experiment} altText="Biểu đồ so sánh chi tiết các chỉ số." />
+  <span slot="caption">So sánh chi tiết Accuracy, Precision, Recall, F1</span>
+</Figure>
+
+<HighlightedSection>
+
+## Nhận xét nhanh
+
+- **XGBoost** vượt trội và ổn định trên hầu hết chỉ số.
+- **Random Forest / Gradient Boosting** đạt hiệu năng tốt, bám sát nhóm đầu.
+- **SVM / Logistic Regression** có kết quả vừa phải.
+- **Decision Tree** đơn lẻ yếu hơn rõ rệt → nên dùng ensemble hoặc boosting.
+
+</HighlightedSection>
+
+## Công thức chỉ số
+
+Accuracy:
+<LaTeX formula="\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}" />
+
+Precision (weighted):
+<LaTeX formula="\text{Precision}_{weighted} = \frac{\sum_{i=1}^{K} n_i \cdot \text{Precision}_i}{\sum_{i=1}^{K} n_i}" />
+
+Recall (weighted):
+<LaTeX formula="\text{Recall}_{weighted} = \frac{\sum_{i=1}^{K} n_i \cdot \text{Recall}_i}{\sum_{i=1}^{K} n_i}" />
+
+F1-Score (weighted):
+<LaTeX formula="F1_{weighted} = \frac{\sum_{i=1}^{K} n_i \cdot F_{1,i}}{\sum_{i=1}^{K} n_i}" />
+
+
+## Reproducibility
+
+```bash
+# Clone repo
+git clone https://github.com/caoTayTang/ML251.git
+cd ML251
+
+# (Optional) Tạo môi trường & cài đặt dependencies
+pip install -r requirements.txt
+
+# Chạy notebook
+jupyter notebook notebooks/1_spaceship_titanic.ipynb
