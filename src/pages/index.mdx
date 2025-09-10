@@ -1,8 +1,8 @@
 ---
 layout: ../layouts/Layout.astro
-title: "Spaceship Titanic — Dự đoán Vận chuyển"
-description: "Landing page vui–mà–xịn cho bài tập lớn ML: từ EDA → pipeline → so sánh mô hình → kết quả."
-favicon: favicon.svg
+title: "Spaceship Titanic — Dự đoán Dịch chuyển"
+description: "Landing page cho bài tập lớn ML: từ EDA → pipeline → so sánh mô hình → kết quả."
+favicon: favicon.png
 thumbnail: og-spaceship.png
 ---
 
@@ -79,12 +79,12 @@ import experiment from "../assets/experiment.png";
 
 Bài toán **Spaceship Titanic** (Kaggle) yêu cầu dự đoán hành khách nào bị *Transported* (dịch chuyển sang chiều không gian khác) sau sự cố trên tàu. Chúng mình làm:
 
-- **EDA**: soi phân phối, missing, và mối liên hệ với `Transported`.
+- **EDA**: phân phối, missing value, và mối liên hệ với `Transported`.
 - **Feature Engineering**: tách `Cabin → Deck/Side`, tách `PassengerId → Group/Member`, chuẩn hoá chi tiêu.
 - **Hai pipeline**: một dành cho mô hình ML chuẩn (impute + scale + one-hot), và một tối ưu cho **XGBoost** (giữ lại missing value).
 - **So sánh mô hình**: Logistic Regression, SVM (RBF), Decision Tree, Random Forest, Gradient Boosting, **XGBoost**.
 
-Kết quả: **XGBoost** dẫn đầu ổn định;
+Kết quả: **XGBoost** dẫn đầu ổn định.
 
 </HighlightedSection>
 
@@ -105,72 +105,61 @@ Kết quả: **XGBoost** dẫn đầu ổn định;
 
 - **Tách đặc trưng**: Deck, Side từ Cabin; Group, Member từ PassengerId.
 - **Pipeline ML chuẩn**: SimpleImputer(median/most_frequent) → StandardScaler → OneHotEncoder.
-- **Pipeline thân thiện XGBoost**: mapping về số nhưng **giữ NaN** (XGBoost xử lý native), hạn chế ép kiểu gây mất thông tin missing.
+- **Pipeline thân thiện XGBoost**: mapping về số nhưng **giữ NaN** (XGBoost xử lý native).
 
 ## Mô hình & Thiết lập
 
 - **ML cổ điển**: Logistic Regression, SVM (RBF), Decision Tree, Random Forest, Gradient Boosting.
 - **Boosting hiện đại**: **XGBoost**.
-- **Đánh giá**: Accuracy, Precision, Recall, F1 (weighted). K-fold Stratified.
+- **Đánh giá**: Accuracy, Precision, Recall, F1 (weighted). Stratified k-fold CV.
 
 <Figure>
   <Image slot="figure" source={modelLeaderboard} altText="Biểu đồ cột so sánh accuracy giữa các mô hình." />
-  <span slot="caption">So sánh chi tiết thông số</span>
-
+  <span slot="caption">So sánh accuracy giữa các mô hình</span>
 </Figure>
 
-## Bảng tổng hợp kết quả
-
+## Kết quả & Phân tích
 
 <Figure>
-  <Image slot="figure" source={experiment} altText="." />
-  <span slot="caption">Bảng xếp hạng mô hình</span>
+  <Image slot="figure" source={experiment} altText="Biểu đồ so sánh chi tiết các chỉ số." />
+  <span slot="caption">So sánh chi tiết Accuracy, Precision, Recall, F1</span>
 </Figure>
 
 <HighlightedSection>
 
 ## Nhận xét nhanh
 
-- **XGBoost** vượt trội và ổn định trên hầu hết chỉ số;
-- **Random Forest / Gradient Boosting** bám sát nhóm trên; **SVM/LogReg** hưởng lợi vừa phải từ PCA.
-- **Decision Tree** đơn thuần yếu hơn rõ rệt → nên dùng ensemble hoặc boosting.
+- **XGBoost** vượt trội và ổn định trên hầu hết chỉ số.
+- **Random Forest / Gradient Boosting** đạt hiệu năng tốt, bám sát nhóm đầu.
+- **SVM / Logistic Regression** có kết quả vừa phải.
+- **Decision Tree** đơn lẻ yếu hơn rõ rệt → nên dùng ensemble hoặc boosting.
 
 </HighlightedSection>
 
 ## Công thức chỉ số
 
-Độ chính xác (Accuracy):
+Accuracy:
 <LaTeX formula="\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}" />
 
-Điểm F1-Score:
-<LaTeX formula="F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}" />
+Precision (weighted):
+<LaTeX formula="\text{Precision}_{weighted} = \frac{\sum_{i=1}^{K} n_i \cdot \text{Precision}_i}{\sum_{i=1}^{K} n_i}" />
 
-## Reproduce
+Recall (weighted):
+<LaTeX formula="\text{Recall}_{weighted} = \frac{\sum_{i=1}^{K} n_i \cdot \text{Recall}_i}{\sum_{i=1}^{K} n_i}" />
+
+F1-Score (weighted):
+<LaTeX formula="F1_{weighted} = \frac{\sum_{i=1}^{K} n_i \cdot F_{1,i}}{\sum_{i=1}^{K} n_i}" />
+
+
+## Reproducibility
 
 ```bash
 # Clone repo
 git clone https://github.com/caoTayTang/ML251.git
 cd ML251
 
-# (Tuỳ chọn) Tạo môi trường & cài đặt phụ thuộc
-# pip install -r requirements.txt
-# hoặc dùng uv:
-# uv pip install -r requirements.txt
+# (Optional) Tạo môi trường & cài đặt dependencies
+pip install -r requirements.txt
 
-# Mở notebook / hoặc build trang
-# jupyter lab
-# npm install && npm run dev   # nếu chạy phần web (Astro)
-```
-
-## Trích dẫn (BibTeX)
-
-```bibtex
-@misc{ml4u2025spaceshiptitanic,
-  author       = "{Lê Chí Đại and Nguyễn Quốc Huy and Phạm Lê Tiến Đạt and Võ Văn Thịnh}",
-  title        = "Dự đoán Vận chuyển trên Tàu không gian Titanic",
-  year         = "2025",
-  howpublished = "\url{https://caotaytang.github.io/ML-251/}",
-}
-```
-
----
+# Chạy notebook
+jupyter notebook notebooks/1_spaceship_titanic.ipynb
