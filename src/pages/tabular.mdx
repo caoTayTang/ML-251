@@ -22,49 +22,22 @@ import edaTarget from "../assets/eda-target-balance.png";
 import edaMissing from "../assets/eda-missing-heatmap.png";
 import modelLeaderboard from "../assets/model-leaderboard.png";
 import experiment from "../assets/experiment.png";
+import dist_perf from "../assets/distribution_of_model_perf.png";
 
 
 <Header
   title={frontmatter.title}
   authors={[
-    {
-      name: "Lê Chí Đại",
-      url: "mailto:dai.lechi@hcmut.edu.vn",
-      institution: "ĐH Bách Khoa TPHCM",
-    },
-    {
-      name: "Nguyễn Quốc Huy",
-      url: "mailto:huy.nguyen2504@hcmut.edu.vn",
-      institution: "ĐH Bách Khoa TPHCM",
-    },
-    {
-      name: "Phạm Lê Tiến Đạt",
-      url: "mailto:dat.pham2005@hcmut.edu.vn",
-      institution: "ĐH Bách Khoa TPHCM",
-    },
-    {
-      name: "Võ Văn Thịnh",
-      url: "mailto:thinh.vovan@hcmut.edu.vn",
-      institution: "ĐH Bách Khoa TPHCM",
-    },
+    { name: "Lê Chí Đại", url: "mailto:dai.lechi@hcmut.edu.vn", institution: "ĐH Bách Khoa TPHCM" },
+    { name: "Nguyễn Quốc Huy", url: "mailto:huy.nguyen2504@hcmut.edu.vn", institution: "ĐH Bách Khoa TPHCM" },
+    { name: "Phạm Lê Tiến Đạt", url: "mailto:dat.pham2005@hcmut.edu.vn", institution: "ĐH Bách Khoa TPHCM" },
+    { name: "Võ Văn Thịnh", url: "mailto:thinh.vovan@hcmut.edu.vn", institution: "ĐH Bách Khoa TPHCM" },
   ]}
   conference="Bài tập lớn - Môn Học Máy (ML4U)"
   links={[
-    {
-      name: "Báo cáo",
-      url: "https://github.com/caoTayTang/ML251/raw/main/docs/SpaceshipTitanic_Report.pdf",
-      icon: "ri:file-pdf-2-line",
-    },
-    {
-      name: "Code",
-      url: "https://github.com/caoTayTang/ML251",
-      icon: "ri:github-line",
-    },
-    {
-      name: "Dataset",
-      url: "https://www.kaggle.com/competitions/spaceship-titanic",
-      icon: "ri:database-2-line",
-    },
+    { name: "Báo cáo", url: "https://github.com/caoTayTang/ML251/raw/main/docs/SpaceshipTitanic_Report.pdf", icon: "ri:file-pdf-2-line" },
+    { name: "Code", url: "https://github.com/caoTayTang/ML251", icon: "ri:github-line" },
+    { name: "Dataset", url: "https://www.kaggle.com/competitions/spaceship-titanic", icon: "ri:database-2-line" },
   ]}
 />
 
@@ -77,14 +50,14 @@ import experiment from "../assets/experiment.png";
 
 ## Tóm tắt
 
-Bài toán **Spaceship Titanic** (Kaggle) yêu cầu dự đoán hành khách nào bị *Transported* (dịch chuyển sang chiều không gian khác) sau sự cố trên tàu. Chúng mình làm:
+Bài toán **Spaceship Titanic** (Kaggle) yêu cầu dự đoán hành khách nào bị *Transported*. Chúng mình làm:
 
 - **EDA**: phân phối, missing value, và mối liên hệ với `Transported`.
-- **Feature Engineering**: tách `Cabin → Deck/Side`, tách `PassengerId → Group/Member`, chuẩn hoá chi tiêu.
-- **Hai pipeline**: một dành cho mô hình ML chuẩn (impute + scale + one-hot), và một tối ưu cho **XGBoost** (giữ lại missing value).
-- **So sánh mô hình**: Logistic Regression, SVM (RBF), Decision Tree, Random Forest, Gradient Boosting, **XGBoost**.
+- **Feature Engineering**: tách `Cabin → Deck/Side`, `PassengerId → Group/Member`, chuẩn hoá chi tiêu.
+- **Pipeline**: (i) Chuẩn ML (impute + scale + one-hot), (ii) Native-friendly (giữ missing cho XGBoost).
+- **So sánh mô hình**: Logistic Regression, SVM (RBF, Linear, Poly), Decision Tree, Random Forest, Gradient Boosting, **XGBoost**, TabNet, TabPFN.
 
-Kết quả: **XGBoost** dẫn đầu ổn định.
+Kết quả: **XGBoost** vẫn dẫn đầu ổn định.
 
 </HighlightedSection>
 
@@ -103,63 +76,52 @@ Kết quả: **XGBoost** dẫn đầu ổn định.
 
 ## Tiền xử lý & Pipeline
 
-- **Tách đặc trưng**: Deck, Side từ Cabin; Group, Member từ PassengerId.
-- **Pipeline ML chuẩn**: SimpleImputer(median/most_frequent) → StandardScaler → OneHotEncoder.
-- **Pipeline thân thiện XGBoost**: mapping về số nhưng **giữ NaN** (XGBoost xử lý native).
+- **Pipeline ML chuẩn**: SimpleImputer → StandardScaler → OneHotEncoder.
+- **Pipeline XGBoost/TabPFN/TabNet**: giữ missing value, mapping về số.
 
 ## Mô hình & Thiết lập
 
-- **ML cổ điển**: Logistic Regression, SVM (RBF), Decision Tree, Random Forest, Gradient Boosting.
-- **Boosting hiện đại**: **XGBoost**.
-- **Đánh giá**: Accuracy, Precision, Recall, F1 (weighted). Stratified k-fold CV.
-
-<Figure>
-  <Image slot="figure" source={modelLeaderboard} altText="Biểu đồ cột so sánh accuracy giữa các mô hình." />
-  <span slot="caption">So sánh accuracy giữa các mô hình</span>
-</Figure>
-
+- **ML cổ điển**: Logistic Regression, SVM (Linear/RBF/Poly), Decision Tree.
+- **Ensemble/Boosting**: Random Forest, Gradient Boosting, XGBoost.
+- **Deep Tabular Models**:
+  - **TabNet** (Google, 2021): sử dụng *sequential attention* để chọn đặc trưng quan trọng, tối ưu cho dữ liệu bảng.
+  - **TabPFN** (Meta, 2022): coi mỗi batch như một *tiny dataset* và dự đoán bằng cách huấn luyện *Bayesian neural prior* (few-shot learning cho tabular).
+- **Thiết lập đánh giá**: F1 (Weighted), Accuracy, Precision, Recall.
+- **Module Config Robust**: Chúng mình xây dựng một module cấu hình linh hoạt, cho phép:
+  - Sinh ra nhiều **pipeline tự động** (scale, PCA, impute, missing handling).
+  - Kết hợp với nhiều mô hình khác nhau trong một vòng chạy.
+  - Tự động log kết quả → tiện cho so sánh hàng loạt mô hình.
 ## Kết quả & Phân tích
 
 <Figure>
-  <Image slot="figure" source={experiment} altText="Biểu đồ so sánh chi tiết các chỉ số." />
-  <span slot="caption">So sánh chi tiết Accuracy, Precision, Recall, F1</span>
+  <Image slot="figure" source={experiment} altText="Biểu đồ top 15 mô hình theo F1." />
+  <span slot="caption">Thí nghiệm</span>
+</Figure>
+
+
+<Figure>
+  <Image slot="figure" source={dist_perf} altText="Phân phối hiệu năng của các mô hình" />
+  <span slot="caption">Phân phối hiệu năng của các mô hình</span>
+</Figure>
+
+
+<Figure>
+  <Image slot="figure" source={modelLeaderboard} altText="Leader Board" />
+  <span slot="caption">Top 15 pipeline tốt nhất và Top 15 pipeline tệ nhất</span>
 </Figure>
 
 <HighlightedSection>
 
 ## Nhận xét nhanh
 
-- **XGBoost** vượt trội và ổn định trên hầu hết chỉ số.
-- **Random Forest / Gradient Boosting** đạt hiệu năng tốt, bám sát nhóm đầu.
-- **SVM / Logistic Regression** có kết quả vừa phải.
-- **Decision Tree** đơn lẻ yếu hơn rõ rệt → nên dùng ensemble hoặc boosting.
+- **XGBoost** tiếp tục khẳng định vị thế: đạt F1 ~0.814, ổn định trên nhiều cấu hình (impute / native missing).
+- **Ensemble truyền thống** (Random Forest, Gradient Boosting) giữ hiệu năng khá, chỉ thua sát nút so với XGBoost.
+- **Deep Tabular Models**:
+  - **TabPFN** hoạt động khá tốt (~0.808) dù không cần huấn luyện lâu, cho thấy tiềm năng mạnh mẽ cho *few-shot tabular*.
+  - **TabNet** ổn định nhưng chưa vượt qua ensemble (F1 ~0.799), tuy nhiên có ưu thế về interpretability (mask attention).
+- **Baseline ML** (SVM, Logistic) cho kết quả trung bình, hợp dùng để so sánh.
+- **Decision Tree** đơn lẻ vẫn yếu nhất (F1 < 0.74) → khẳng định lợi ích rõ rệt của boosting/ensemble.
+
+💡 Điểm cộng: nhờ **Module Config** rất robust, nhóm có thể thử nghiệm nhanh hàng chục pipeline (scale, PCA, impute, giữ missing) mà không cần chỉnh tay, giúp việc so sánh toàn diện và tái lập dễ dàng.
 
 </HighlightedSection>
-
-## Công thức chỉ số
-
-Accuracy:
-<LaTeX formula="\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}" />
-
-Precision (weighted):
-<LaTeX formula="\text{Precision}_{weighted} = \frac{\sum_{i=1}^{K} n_i \cdot \text{Precision}_i}{\sum_{i=1}^{K} n_i}" />
-
-Recall (weighted):
-<LaTeX formula="\text{Recall}_{weighted} = \frac{\sum_{i=1}^{K} n_i \cdot \text{Recall}_i}{\sum_{i=1}^{K} n_i}" />
-
-F1-Score (weighted):
-<LaTeX formula="F1_{weighted} = \frac{\sum_{i=1}^{K} n_i \cdot F_{1,i}}{\sum_{i=1}^{K} n_i}" />
-
-
-## Reproducibility
-
-```bash
-# Clone repo
-git clone https://github.com/caoTayTang/ML251.git
-cd ML251
-
-# (Optional) Tạo môi trường & cài đặt dependencies
-pip install -r requirements.txt
-
-# Chạy notebook
-jupyter notebook notebooks/1_spaceship_titanic.ipynb
