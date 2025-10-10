@@ -1,8 +1,175 @@
 ---
+title:  McDonald's Store Reviews - Dự Đoán Rating từ Review
 layout: ../layouts/Layout.astro
-title: "Bài tập lớn 2"
+description: Bài tập lớn 2 - Xử lý dữ liệu văn bản (McDonald's Store Reviews)
+favicon: mcdonald.png
+thumbnail: thumbnailBTL2.png
 ---
 
-# Bài tập lớn 2
-Đây là nội dung BTL2.
-Link báo cáo, code, dataset... để đây.
+import Header from "../components/Header.astro";
+import HighlightedSection from "../components/HighlightedSection.astro";
+import Figure from "../components/Figure.astro";
+import Image from "../components/Image.astro";
+import TwoColumns from "../components/TwoColumns.astro";
+import LaTeX from "../components/LaTeX.astro";
+
+import banner from "../assets/text_image/thumbnailBTL2.png"
+import ratingDistribution from "../assets/text_image/rating_distribution.png";
+import distributionLenOfReview from "../assets/text_image/distribution_len_of_review.png";
+import distributionNumOfWord from "../assets/text_image/distribution_num_of_word.png";
+import wordcloudImg from "../assets/text_image/wordcloud.png";
+import top10 from "../assets/text_image/top10.png";
+import distF1ByFeat from "../assets/text_image/distribution_of_F1_score_by_feature_extractor.png";
+import rankingF1 from "../assets/text_image/ranking_experiments_F1_score.png";
+import top5Bottom5 from "../assets/text_image/top_5_and_bottom_5.png";
+
+<Header 
+  title={frontmatter.title}
+  authors={[
+    { name: "Lê Chí Đại", url: "mailto:dai.lechi@hcmut.edu.vn", institution: "ĐH Bách Khoa TPHCM" },
+    { name: "Nguyễn Quốc Huy", url: "mailto:huy.nguyen2504@hcmut.edu.vn", institution: "ĐH Bách Khoa TPHCM" },
+    { name: "Phạm Lê Tiến Đạt", url: "mailto:dat.pham2005@hcmut.edu.vn", institution: "ĐH Bách Khoa TPHCM" },
+    { name: "Võ Văn Thịnh", url: "mailto:thinh.vovan@hcmut.edu.vn", institution: "ĐH Bách Khoa TPHCM" },
+  ]}
+  conference="Bài tập lớn - Môn Học Máy (ML4U)"
+  links={[
+    { name: "Code", url: "https://github.com/caoTayTang/ML251", icon: "ri:github-line" },
+    { name: "Dataset", url: "https://www.kaggle.com/datasets/nelgiriyewithana/mcdonalds-store-reviews", icon: "ri:database-2-line" },
+    { name: "Colab", url: "https://colab.research.google.com/drive/1X4WtaY9Jf77zCHagV7b-N1B5IAxJKrjO?usp=sharing", icon: "ri:code-s-slash-line" },
+  ]}
+/>
+
+<Figure>
+  <Image slot="figure" source={banner} altText="Ảnh thumbnail" />
+</Figure>
+
+
+<HighlightedSection>
+
+## Tóm tắt
+
+Bài toán **McDonald's Store Reviews** yêu cầu dự đoán **điểm đánh giá (1–5 sao)** từ **nội dung bình luận của khách hàng**.
+
+Chúng mình thực hiện:
+
+- **Tiền xử lý văn bản:** loại bỏ dấu câu, chuyển chữ thường, xoá stopwords, chuẩn hoá độ dài chuỗi.  
+- **Biểu diễn đặc trưng:**  
+  - Truyền thống: **TF-IDF**, **Bag-of-Words (BoW)**, **n-gram**.  
+  - Hiện đại: **DistilBERT Embedding**.  
+- **Huấn luyện & đánh giá:** So sánh các mô hình từ **Naive Bayes, Logistic Regression, SVM, RNN, LSTM** đến **DistilBERT Fine-tuned**.  
+- **Phân tích kết quả:** Đánh giá theo **Accuracy**, **F1-Score**, và phân tích hiệu năng giữa mô hình truyền thống và transformer.
+
+Kết quả: **DistilBERT Fine-tuned** cho độ chính xác cao nhất.
+
+</HighlightedSection>
+
+---
+
+## Giới thiệu
+
+- Dữ liệu được lấy từ **[Kaggle: McDonald’s Store Reviews](https://www.kaggle.com/datasets/nelgiriyewithana/mcdonalds-store-reviews/data)**  
+- Gồm **33,396 đánh giá** của khách hàng, mỗi mẫu có 10 thuộc tính, trong đó `review` (chuỗi văn bản) là đầu vào, và `rating` (1–5 sao) là nhãn dự đoán.
+
+---
+
+## Định nghĩa bài toán
+
+> “Với một đánh giá của khách hàng, liệu mô hình có thể dự đoán chính xác số sao mà họ đã cho không?”
+
+- **Input:** Văn bản tự do (độ dài và cảm xúc khác nhau).  
+- **Output:** Nhãn số nguyên từ 1 đến 5 (mức độ hài lòng).  
+
+---
+
+## Quy trình xử lý dữ liệu
+
+**1️⃣ Tiền xử lý (Preprocessing)**  
+- Chuyển chữ thường  
+- Loại bỏ dấu câu, ký tự đặc biệt  
+- Tokenization và loại bỏ stopwords  
+- Padding để thống nhất độ dài  
+
+**2️⃣ Biểu diễn đặc trưng (Feature Extraction)**  
+- **TF-IDF + n-gram / BoW + n-gram**: mô hình thống kê tần suất từ  
+- **[DistilBERT Embedding](https://huggingface.co/docs/transformers/model_doc/distilbert)**: trích xuất embedding bằng mô hình transformer  
+
+**3️⃣ Huấn luyện mô hình (Model Training)**  
+- Các mô hình truyền thống (Naive Bayes, Logistic Regression, SVM)  
+- Mô hình tuần tự (RNN, LSTM)  
+- Mô hình ngữ cảnh (DistilBERT fine-tuned)
+
+---
+
+## Khám phá dữ liệu (EDA)
+
+<Figure>
+  <Image slot="figure" source={ratingDistribution} altText="Phân phối đánh giá" />
+</Figure>
+
+- Tập dữ liệu **mất cân bằng**: nhiều đánh giá 1⭐ và 5⭐ → cần **class weighting** trong huấn luyện.  
+<TwoColumns>
+  <div slot="left">
+    <Figure>
+      <Image slot="figure" source={distributionLenOfReview} altText="Phân phối độ dài bình luận" />
+    </Figure>
+  </div>
+  <div slot="right">
+    <Figure>
+      <Image slot="figure" source={distributionNumOfWord} altText="Phân phối độ dài bình luận" />
+    </Figure>
+  </div>
+</TwoColumns>
+
+- **Độ dài bình luận** thay đổi mạnh — có những đánh giá chỉ vài từ và cũng có đoạn mô tả dài hơn 100 từ.
+
+---
+
+## WordCloud — Trực quan hoá ngôn ngữ
+
+<Figure>
+  <Image slot="figure" source={wordcloudImg} altText="WordCloud thể hiện tần suất từ xuất hiện trong đánh giá" />
+</Figure>
+
+- Từ thường gặp trong đánh giá tích cực: **"Excellent"**, **"McDonald"**, **"good"**, **"food"**
+- Từ thường gặp trong đánh giá tiêu cực: **"food"**, **"order"**, **"McDonald"**
+
+
+## Kết quả thực nghiệm
+
+
+<Figure>
+  <Image slot="figure" source={top10} altText="Bảng kết quả top 10 thí nghiệm" />
+  <span slot="caption">Bảng kết quả top 10 thí nghiệm theo (Macro F1 score).</span>
+</Figure>
+
+<Figure>
+  <Image slot="figure" source={rankingF1} altText="Xếp hạng thí nghiệm theo F1-score" />
+  <span slot="caption">So sánh hiệu năng giữa các mô hình dựa trên F1-score.</span>
+</Figure>
+
+<Figure>
+  <Image slot="figure" source={distF1ByFeat} altText="Phân phối F1-score theo loại đặc trưng" />
+  <span slot="caption">Phân phối F1-score giữa các phương pháp trích xuất đặc trưng khác nhau.</span>
+</Figure>
+
+<Figure>
+  <Image slot="figure" source={top5Bottom5} altText="So sánh top 5 và bottom 5 mô hình" />
+  <span slot="caption">Hiệu năng của 5 mô hình có F1-score cao nhất và thấp nhất.</span>
+</Figure>
+
+---
+<HighlightedSection title="Kết luận rút ra từ kết quả thực nghiệm">
+
+## Nhận xét nhanh
+
+- **DistilBERT** dẫn đầu (F1 ≈ 0.668) nhờ khả năng hiểu ngữ cảnh và biểu diễn ngữ nghĩa sâu.  
+- **BoW + Logistic Regression** (Bigram/Trigram) đạt hiệu năng cao, chứng minh mô hình tuyến tính vẫn hiệu quả khi đặc trưng được chọn hợp lý.  
+- **TF-IDF + Linear SVC** ổn định và cạnh tranh, là lựa chọn cân bằng giữa hiệu năng và chi phí huấn luyện.  
+- **BERT Sequence + LSTM** không cải thiện đáng kể, cho thấy việc chồng thêm tầng tuần tự không luôn mang lại lợi ích khi dữ liệu hạn chế.  
+- **BoW/TF-IDF Unigram** cho kết quả thấp hơn rõ rệt → khẳng định tầm quan trọng của đặc trưng ngữ cảnh (n-gram).  
+- 💡 **Điểm sáng:** Các mô hình truyền thống (Logistic Regression, SVM) kết hợp với TF-IDF hoặc BoW vẫn đạt kết quả tốt, cạnh tranh mạnh mẽ với transformer nếu được tinh chỉnh tốt.
+
+</HighlightedSection>
+---
+
+
