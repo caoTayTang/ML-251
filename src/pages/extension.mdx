@@ -1,8 +1,130 @@
 ---
 layout: ../layouts/Layout.astro
-title: "Phần mở rộng"
+title: "Nhận dạng Chữ số qua Giọng nói với HMM"
+description: "Landing page cho project mở rộng môn Học Máy: từ EDA âm thanh → MFCC → HMM from scratch → demo."
+favicon: favicon.png
+thumbnail: og-audio.png
 ---
 
-# Phần mở rộng
-Đây là nội dung Phần mở rộng.
-Link báo cáo, code, dataset... để đây.
+import Header from "../components/Header.astro";
+import HighlightedSection from "../components/HighlightedSection.astro";
+import Figure from "../components/Figure.astro";
+import Image from "../components/Image.astro";
+import TwoColumns from "../components/TwoColumns.astro";
+import LaTeX from "../components/LaTeX.astro";
+
+import CodeBlock from "../components/CodeBlock.astro";
+import Table from "../components/Table.astro";
+export const components = { pre: CodeBlock, table: Table };
+
+import heroBanner from "../assets/hero-audio-wave.jpg";
+import edaSpectrogram from "../assets/eda-spectrogram.png";
+import edaDuration from "../assets/eda-duration.png";
+import mfccComparison from "../assets/mfcc-comparison.png";
+import hmmArchitecture from "../assets/hmm-architecture.png";
+import finalResult from "../assets/final-result-accuracy.png";
+import gradioDemo from "../assets/gradio-demo.png";
+
+<Header
+  title={frontmatter.title}
+  authors={[
+    { name: "Lê Chí Đại", url: "mailto:dai.lechi@hcmut.edu.vn", institution: "ĐH Bách Khoa TP.HCM" },
+    { name: "Nguyễn Quốc Huy", url: "mailto:huy.nguyen2504@hcmut.edu.vn", institution: "ĐH Bách Khoa TP.HCM" },
+    { name: "Phạm Lê Tiến Đạt", url: "mailto:dat.pham2005@hcmut.edu.vn", institution: "ĐH Bách Khoa TP.HCM" },
+    { name: "Võ Văn Thịnh", url: "mailto:thinh.vovan@hcmut.edu.vn", institution: "ĐH Bách Khoa TP.HCM" },
+  ]}
+  conference="Bài tập lớn Mở rộng - Môn Học Máy (ML4U)"
+  links={[
+    { name: "Báo cáo", url: "https://github.com/caoTayTang/ML251/tree/main/docs/mlAssignments_v1.1.pdf", icon: "ri:file-pdf-2-line" },
+    { name: "Code", url: "https://github.com/caoTayTang/ML251", icon: "ri:github-line" },
+    { name: "Dataset", url: "https://www.kaggle.com/datasets/joserzapata/free-spoken-digit-dataset-fsdd", icon: "ri:database-2-line" },
+    { name: "Colab", url: "https://colab.research.google.com/drive/1inuPaVsYo-psKF0Q6-9A5QziwY_5B1j8?usp=sharing", icon: "ri:code-s-slash-line" },
+  ]}
+/>
+
+<Figure>
+  <Image slot="figure" source={heroBanner} altText="Minh hoạ sóng âm và kiến trúc mô hình HMM." />
+  <span slot="caption">Biến đổi sóng âm thành chữ số bằng Mô hình Markov Ẩn 🔊</span>
+</Figure>
+
+<HighlightedSection>
+
+## Tóm tắt
+
+Đây là project mở rộng cho môn Học Máy, tập trung vào bài toán **Nhận dạng Chữ số qua Giọng nói** (Spoken Digit Recognition). Chúng mình đã thực hiện:
+
+- **EDA**: Phân tích dữ liệu âm thanh qua dạng sóng, spectrogram, và các đặc trưng âm học cơ bản (ZCR, thời lượng).
+- **Feature Engineering**: Trích xuất đặc trưng **MFCC** (Mel-Frequency Cepstral Coefficients) để biểu diễn tín hiệu tiếng nói một cách cô đọng.
+- **Mô hình**:
+  - Xây dựng **Mô hình Markov Ẩn (HMM) from scratch**, cài đặt các thuật toán cốt lõi (Forward, Viterbi, Baum-Welch).
+  - Huấn luyện 10 mô hình HMM riêng biệt, mỗi mô hình cho một chữ số (0-9).
+- **Đánh giá**: Đạt độ chính xác **93.78%** trên tập test, chứng minh hiệu quả của phương pháp kinh điển.
+- **Demo**: Triển khai một ứng dụng web tương tác bằng Gradio.
+
+</HighlightedSection>
+
+## Khám phá dữ liệu Âm thanh (EDA)
+
+<TwoColumns>
+  <Figure slot="left">
+    <Image slot="figure" source={edaSpectrogram} altText="Biểu đồ spectrogram của các chữ số khác nhau." />
+    <span slot="caption">Spectrogram cho thấy "dấu vân tay âm học" của mỗi chữ số thay đổi theo thời gian.</span>
+  </Figure>
+  <Figure slot="right">
+    <Image slot="figure" source={edaDuration} altText="Biểu đồ hộp phân bố thời lượng phát âm." />
+    <span slot="caption">Thời lượng phát âm thay đổi lớn, đặc biệt với các chữ số nhiều âm tiết.</span>
+  </Figure>
+</TwoColumns>
+
+## Trích xuất Đặc trưng & Pipeline
+
+- **Từ Waveform đến MFCC**: Tín hiệu âm thanh thô rất phức tạp. Chúng mình chuyển đổi nó thành chuỗi vector **MFCC**, một đặc trưng ổn định, cô đọng và mô phỏng cách tai người cảm nhận âm thanh.
+- **Pipeline dữ liệu**: Xây dựng một class `FSDD` để tự động hóa việc tải audio, trích xuất và lưu cache MFCC, giúp quá trình thí nghiệm nhanh chóng và hiệu quả.
+
+<Figure>
+  <Image slot="figure" source={mfccComparison} altText="So sánh giữa waveform thô và heatmap MFCC." />
+  <span slot="caption">MFCC (phải) tạo ra một biểu diễn ổn định và dễ phân biệt hơn nhiều so với waveform thô (trái).</span>
+</Figure>
+
+
+## Mô hình Markov Ẩn (HMM)
+
+- **Cài đặt từ đầu (From Scratch)**: Để hiểu sâu về thuật toán, nhóm đã tự cài đặt lớp `GaussianHMM`, bao gồm các thuật toán cốt lõi:
+  - **Forward-Backward**: Dùng trong quá trình học tham số.
+  - **Baum-Welch (Expectation-Maximization)**: Thuật toán học tham số mô hình từ dữ liệu.
+  - **Viterbi (optional for decoding)** và **Forward (for scoring)**: Dùng để dự đoán.
+- **Kiến trúc hệ thống**:
+  - **"Một HMM cho mỗi lớp"**: Chúng mình huấn luyện 10 mô hình HMM, mỗi mô hình chuyên biệt để nhận dạng một chữ số (0-9).
+  - **Dự đoán**: Một file âm thanh mới sẽ được tính điểm trên cả 10 mô hình. Mô hình nào cho điểm likelihood cao nhất sẽ là kết quả dự đoán.
+
+<Figure>
+  <Image slot="figure" height={400} source={hmmArchitecture} altText="Sơ đồ kiến trúc hệ thống HMM." />
+  <span slot="caption">Mỗi mô hình HMM được huấn luyện để nhận dạng một chữ số cụ thể.</span>
+</Figure>
+
+
+## Kết quả & Demo
+<TwoColumns>
+    <Figure slot="left">
+      <Image slot="figure" source={finalResult} altText="Kết quả độ chính xác trên tập test." />
+      <span slot="caption">Độ chính xác đạt 93.78%, một kết quả rất tốt cho mô hình kinh điển.</span>
+    </Figure>
+    <Figure slot="right">
+      <Image slot="figure" source={gradioDemo} altText="Ảnh GIF minh hoạ demo Gradio." />
+      <span slot="caption">Demo tương tác cho phép ghi âm và nhận dạng chữ số trong thời gian thực.</span>
+    </Figure>
+</TwoColumns>
+
+
+<HighlightedSection>
+
+## Nhận xét nhanh
+
+- **HMM vẫn rất hiệu quả**: Dù là một mô hình kinh điển, HMM chứng tỏ sức mạnh vượt trội trong việc mô hình hóa dữ liệu chuỗi, đạt độ chính xác cao trên bài toán nhận dạng tiếng nói đơn giản.
+- **MFCC là chìa khóa**: Thành công của mô hình phụ thuộc rất lớn vào việc lựa chọn và trích xuất đặc trưng. MFCC đã chứng minh được vai trò không thể thiếu của mình.
+- **Cài đặt "from scratch"**: Việc tự cài đặt giúp nhóm hiểu rõ bản chất toán học và các bước tối ưu của thuật toán EM (Baum-Welch), một kiến thức nền tảng quan trọng.
+- **Demo trực quan**: Sản phẩm demo cuối cùng không chỉ trình diễn kết quả mà còn mang lại một trải nghiệm tương tác thú vị, kết nối lý thuyết với thực tiễn.
+
+💡 **Điểm cộng:** Project không chỉ dừng lại ở việc dùng thư viện, mà còn đi sâu vào việc cài đặt lại mô hình HMM từ đầu, thể hiện sự nắm vững kiến thức cốt lõi và kỹ năng lập trình của nhóm.
+
+</HighlightedSection>
