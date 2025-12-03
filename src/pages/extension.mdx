@@ -12,6 +12,8 @@ import Figure from "../components/Figure.astro";
 import Image from "../components/Image.astro";
 import TwoColumns from "../components/TwoColumns.astro";
 import LaTeX from "../components/LaTeX.astro";
+import Video from "../components/Video.astro";
+import GradioEmbed from "../components/GradioEmbed.astro";
 
 import CodeBlock from "../components/CodeBlock.astro";
 import Table from "../components/Table.astro";
@@ -24,6 +26,7 @@ import mfccComparison from "../assets/mfcc-comparison.png";
 import hmmArchitecture from "../assets/hmm-architecture.png";
 import finalResult from "../assets/final-result-accuracy.png";
 import gradioDemo from "../assets/gradio-demo.png";
+import hmmDemoVideo from "../assets/hmm_demo.mp4";
 
 <Header
   title={frontmatter.title}
@@ -103,7 +106,37 @@ import gradioDemo from "../assets/gradio-demo.png";
 </Figure>
 
 
-## Kết quả & Demo
+## Demo
+
+<Figure>
+  <Video slot="figure" source={hmmDemoVideo} />
+  <span slot="caption">Demo nhận dạng chữ số qua giọng nói (HMM + MFCC).</span>
+</Figure>
+
+{/*
+  Chrome & Edge: show iframe
+  Firefox: show button
+*/}
+<div class="block firefox:hidden">
+  <iframe
+    src="https://huggingface.co/spaces/kaiosTheFox123/hmm_btl3/embed"
+    class="w-full"
+    style="height:600px; border:none;"
+  ></iframe>
+</div>
+
+<div class="hidden firefox:block text-center">
+  <p>Firefox không hỗ trợ nhúng trang này.</p>
+  <a
+    href="https://huggingface.co/spaces/kaiosTheFox123/hmm_btl3"
+    target="_blank"
+    class="bg-blue-600 text-white px-4 py-2 rounded-lg inline-block"
+  >
+    Mở demo
+  </a>
+</div>
+
+## Kết quả
 <TwoColumns>
     <Figure slot="left">
       <Image slot="figure" source={finalResult} altText="Kết quả độ chính xác trên tập test." />

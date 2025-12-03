@@ -89,3 +89,12 @@ ol {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(to bottom, #2563eb, #7c3aed);
 }
+
+@-moz-document url-prefix() {
+  .firefox\:hidden {
+    display: none;
+  }
+  .firefox\:block {
+    display: block;
+  }
+}

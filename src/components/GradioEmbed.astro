@@ -1,0 +1,16 @@
+---
+interface Props {
+  src: string;
+}
+const { src } = Astro.props;
+---
+
+<div class="w-full flex justify-center">
+  <iframe
+    src={src}
+    frameborder="0"
+    class="w-full rounded-xl"
+    style="height: 600px; border: none;"
+    allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; clipboard-write;"
+  ></iframe>
+</div>
