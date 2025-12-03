@@ -1,0 +1,21 @@
+---
+// Props:
+// - name: string
+// - image: string
+// - size: number (optional, default 120)
+import { Image as AstroImage } from "astro:assets";
+
+const { name, image, size = 120 } = Astro.props;
+
+---
+
+<div class="team-member text-center">
+  <AstroImage
+    src={image}
+    alt={name}
+    width={size}
+    height={size}
+    class="rounded-full object-cover shadow-md mx-auto"
+  />
+  <p class="mt-2 font-medium">{name}</p>
+</div>

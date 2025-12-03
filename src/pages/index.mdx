@@ -12,8 +12,13 @@ import Figure from "../components/Figure.astro";
 import Image from "../components/Image.astro";
 import TwoColumns from "../components/TwoColumns.astro";
 import LaTeX from "../components/LaTeX.astro";
+import TeamMember from "../components/TeamMember.astro";
 
 import logo from "../assets/hcmut-logo.png";
+import dai from "../assets/dai.jpeg"
+import dat from "../assets/dat.jpeg"
+import huy from "../assets/huy.jpeg"
+import thinh from "../assets/thinh.jpeg"
 
 import CodeBlock from "../components/CodeBlock.astro";
 import Table from "../components/Table.astro";
@@ -57,10 +62,14 @@ export const components = { pre: CodeBlock, table: Table };
 
 ## Nhóm ML4U
 **Thành viên:**
-- Lê Chí Đại
-- Nguyễn Quốc Huy
-- Phạm Lê Tiến Đạt
-- Võ Văn Thịnh
+<div class="team flex flex-wrap justify-center gap-6 mt-4">
+  <TeamMember name="Lê Chí Đại" image={dai} />
+  <TeamMember name="Nguyễn Quốc Huy" image={huy} />
+  <TeamMember name="Phạm Lê Tiến Đạt" image={dat} />
+  <TeamMember name="Võ Văn Thịnh" image={thinh} />
+</div>
+
+
 
 **Giảng viên hướng dẫn:** TS. Lê Thành Sách
 
